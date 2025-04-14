@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.so
+
+# Virtual environments
+.env/
+.venv/
+env/
+venv/
+.uv/
+
+# Jupyter Notebook checkpoints (in caso usi notebook per test)
+.ipynb_checkpoints/
+
+# SQLite DB
+*.sqlite
+*.sqlite3
+*.db
+
+# Logs
+*.log
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# macOS
+.DS_Store
+
+# Ollama cache (se usi local models)
+~/.ollama/
+
+# Archive or temp files
+*.zip
+*.tar.gz
+*.bak
+*.tmp
+
+# Python package artifacts
+build/
+dist/
+*.egg-info/
+
+# pyproject-lock from uv
+pyproject.lock
