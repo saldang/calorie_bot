@@ -7,13 +7,12 @@ def query_phi4(user_text: str, csv_data: str) -> dict:
 
     response = requests.post(
         "http://localhost:11434/api/generate",
-        json={"model": "phi", "prompt": prompt},
+        json={"model": "phi4", "prompt": prompt, "stream": False}
     )
     response.raise_for_status()
 
     output = response.json()["response"]
 
-    # Estrai blocco JSON dalla risposta
     start = output.find("<json>")
     end = output.find("</json>")
 
@@ -22,3 +21,4 @@ def query_phi4(user_text: str, csv_data: str) -> dict:
 
     json_data = output[start + len("<json>"):end]
     return json.loads(json_data.strip())
+

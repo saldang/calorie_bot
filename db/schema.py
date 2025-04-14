@@ -10,6 +10,7 @@ def init_db():
     CREATE TABLE IF NOT EXISTS utenti (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         telegram_id TEXT UNIQUE,
+        chat_id TEXT,
         nome TEXT,
         cognome TEXT,
         altezza_cm INTEGER,

@@ -7,18 +7,29 @@ from telegram.ext import (
     filters
 )
 from llm.phi_interface import query_phi4
-from db.db_manager import insert_pasto
-
+from db.db_manager import insert_pasto, get_last_7_days_summary, get_or_create_user
+from utils.graphing import plot_calorie_summary
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+    chat_id = str(update.effective_chat.id)
+
+    user_id = get_or_create_user(
+        telegram_id=str(user.id),
+        chat_id=chat_id,
+        nome=user.first_name or "",
+        cognome=user.last_name or ""
+    )
+
     await update.message.reply_text(
-        f"Ciao {user.first_name}! Benvenuto nel tuo diario alimentare 🥗\nScrivimi cosa hai mangiato oggi!"
+        f"Ciao {user.first_name}! 🎉 Il tuo diario alimentare è stato attivato.\n"
+        f"ID utente nel sistema: {user_id}\n\nScrivimi cosa hai mangiato oggi!"
     )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -47,10 +58,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception as e:
         await update.message.reply_text(f"Errore nell'analisi del pasto: {e}")
+async def report(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = 1  # da sostituire con gestione utenti vera
+    data = get_last_7_days_summary(user_id)
 
-def run_bot():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    if not data:
+        await update.message.reply_text("Nessun dato registrato negli ultimi 7 giorni.")
+        return
+
+    msg = "📊 Consumo calorico ultimi 7 giorni:\n"
+    for date, kcal in data:
+        msg += f"{date}: {int(kcal)} kcal\n"
+
+    graph = plot_calorie_summary(data)
+    await update.message.reply_photo(photo=graph, caption=msg)
+
+def setup_handlers(app):
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("report", report))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    print("✅ Bot avviato. In attesa di messaggi...")
-    app.run_polling()

@@ -47,3 +47,5 @@ dist/
 
 # pyproject-lock from uv
 pyproject.lock
+
+.env
